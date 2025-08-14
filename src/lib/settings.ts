@@ -1,8 +1,8 @@
-import { STORES } from "./stores";
+import { STORES, type StoreId } from "./stores";
 
-export type Settings = {
+export interface Settings {
     version: 1
-    enabled: Partial<Record<string, boolean>>
+    enabled: Record<string, boolean>
 }
 
 const KEY = "settings"
@@ -25,6 +25,7 @@ export function withDefaults(base?: Partial<Settings>): Settings {
             merged.enabled[s.id] = defaults.enabled[s.id]
         }
     }
+    
     return merged
 }
 
