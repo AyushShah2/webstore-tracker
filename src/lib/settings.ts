@@ -1,4 +1,4 @@
-import { STORES, type StoreId } from "./stores";
+import { STORES } from "./stores";
 
 export interface Settings {
     version: 1
@@ -15,18 +15,11 @@ const deriveDefaults = (): Settings => ({
 export function withDefaults(base?: Partial<Settings>): Settings {
     const defaults = deriveDefaults()
     const sameVersion = base?.version === defaults.version
-    const merged: Settings = {
+    
+    return {
         version: defaults.version,
         enabled: {...defaults.enabled, ...(sameVersion ? base?.enabled : undefined) }
     }
-
-    for (const s of STORES) {
-        if (merged.enabled[s.id] === undefined) {
-            merged.enabled[s.id] = defaults.enabled[s.id]
-        }
-    }
-    
-    return merged
 }
 
 export async function loadSettings(): Promise<Settings> {

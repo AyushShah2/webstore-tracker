@@ -3,7 +3,7 @@
   "displayName": "Webstore Tracker",
   "version": "0.0.1",
   "description": "A browser extension that will track the prices of all products in any webstore.",
-  "author": "Ayush Shah",
+  "author": "Ayush Shah, Eric Song",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
