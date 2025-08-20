@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import "./popup.css"
 import { STORES } from "~lib/stores"
 import { loadSettings, withDefaults, type Settings } from "~lib/settings"
+import browser from 'webextension-polyfill'
 
 export default function Popup() {
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -16,14 +17,14 @@ export default function Popup() {
         setSettings(withDefaults(changes.settings.newValue))
       }
     }
-    chrome.storage.onChanged.addListener(onChanged)
+    browser.storage.onChanged.addListener(onChanged)
     return () => {
       mounted = false
-      chrome.storage.onChanged.removeListener(onChanged)
+      browser.storage.onChanged.removeListener(onChanged)
     }
   }, [])
 
-  const openOptions = () => chrome.runtime.openOptionsPage()
+  const openOptions = async () => await browser.runtime.openOptionsPage()
 
   if (!settings) {
     return (
