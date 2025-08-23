@@ -1,11 +1,13 @@
-import { getRecordByKey, type StoreDef, addOrUpdateProduct } from '../../useDB';
+import Browser from 'webextension-polyfill';
+import { type StoreId } from '~lib/stores';
+import { addOrUpdateProduct, getRecordByKey, type StoreDef } from '../../useDB';
 
-async function main() {
+export async function main() {
 
     let today = new Date();
     let formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(); //YYYY-MM-DD format
-
-    const STORE_NAME: string = 'nike';
+    
+    const STORE_NAME: StoreId = 'nike';
     const STORE_INFO: StoreDef = {
         keyPath: 'globalProductId',
         indexes: [
@@ -14,6 +16,9 @@ async function main() {
             { name: 'lastUpdated', keyPath: 'lastUpdated', unique: false },
         ]
     };
+
+    const storageKeyValue = {lastScraped: formattedDate, isActive: true}
+    await Browser.storage.local.set({[STORE_NAME]: storageKeyValue});
 
     const startTime = today.getTime();
     const baseUrl: string = "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
@@ -52,7 +57,7 @@ async function main() {
             for (const product of (group?.products ?? [])) {
                 const productData = await getRecordByKey(STORE_NAME, STORE_INFO, product?.globalProductId);
                 if (!(productData?.lastUpdated === formattedDate)) {
-                    await addOrUpdateProduct(STORE_NAME, STORE_INFO, {
+                    await addOrUpdateProduct(STORE_NAME, STORE_INFO, STORE_INFO.keyPath, {
                         globalProductId: product?.globalProductId,
                         groupKey: product?.groupKey,
                         productCode: product?.productCode,

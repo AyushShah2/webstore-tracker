@@ -37,7 +37,9 @@
     "manifest_version": 3,
     "permissions": [
       "storage",
-      "scripting"
+      "scripting",
+      "alarms",
+      "unlimitedStorage"
     ],
     "host_permissions": [
       "https://*/*",
