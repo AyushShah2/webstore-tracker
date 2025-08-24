@@ -1,3 +1,5 @@
+import type { Product } from "./nike/v1/types";
+
 import { type StoreId } from "~lib/stores";
 
 const indexedDB = globalThis.indexedDB;
@@ -20,15 +22,6 @@ export interface StoreMetadata {
     isActive?: boolean;
     lastScraped?: string;       //YYYY-MM-DD format
 }
-
-export const storesMetadataDef: StoreDef = {
-    keyPath: "id",
-    indexes: [
-        { name: "name", keyPath: "name", unique: false },
-        { name: "isActive", keyPath: "isActive", unique: false },
-        { name: "lastScraped", keyPath: "lastScraped", unique: false }
-    ]
-};
 
 async function openDB(storeName: string, storeInfo: StoreDef): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -55,7 +48,7 @@ async function openDB(storeName: string, storeInfo: StoreDef): Promise<IDBDataba
 }
 
 
-export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef, keyPath: string | string[], product: any): Promise<void> {
+export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef, product: Product): Promise<void> {
     const db = await openDB(storeName, storeInfo);
     try {
         const trxn = db.transaction(storeName, "readwrite");
@@ -69,7 +62,7 @@ export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef,
 
         await new Promise<void>((resolve, reject) => {
             trxn.oncomplete = () => {
-                console.log(`(${i}) Product ${product.keyPath} recorded successfully.`);
+                console.log(`(${i}) Product ${product.key} recorded successfully.`);
                 i++;
                 resolve();
             };
@@ -80,7 +73,7 @@ export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef,
     }
 }
 
-export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key: any): Promise<any | undefined> {
+export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key: string): Promise<Product | undefined> {
     const db = await openDB(storeName, storeInfo);
     try {
         const trxn = db.transaction(storeName, "readonly");
@@ -101,12 +94,12 @@ export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key
     }
 }
 
-export async function getRecordByIndex(storeName: string, storeInfo: StoreDef, indexName: string, searchKey: any): Promise<any | undefined> {
+export async function getRecordByIndex(storeName: string, storeInfo: StoreDef, indexName: string, searchKey: string): Promise<Product | undefined> {
     const db = await openDB(storeName, storeInfo);
     try {
         const trxn = db.transaction(storeName, "readonly");
         const store = trxn.objectStore(storeName);
-        const result = await new Promise<any | undefined>((resolve, reject) => {
+        const result = await new Promise<Product | undefined>((resolve, reject) => {
             const request = store.index(indexName)?.get(searchKey);
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);

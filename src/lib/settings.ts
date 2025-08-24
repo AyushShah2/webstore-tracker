@@ -1,4 +1,4 @@
-import Browser from "webextension-polyfill";
+import browser from "webextension-polyfill";
 import { STORES } from "./stores";
 
 export interface Settings {
@@ -24,10 +24,10 @@ export function withDefaults(base?: Partial<Settings>): Settings {
 }
 
 export async function loadSettings(): Promise<Settings> {
-    const obj = await Browser.storage.sync.get(KEY)
+    const obj = await browser.storage.sync.get(KEY)
     return withDefaults(obj[KEY])
 }
 
 export async function saveSettings(s: Settings): Promise<void> {
-    await Browser.storage.sync.set({ [KEY]: withDefaults(s) })
+    await browser.storage.sync.set({ KEY: withDefaults(s) })
 }

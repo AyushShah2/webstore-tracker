@@ -12,7 +12,7 @@ export default function Popup() {
     loadSettings().then((s) => mounted && setSettings(withDefaults(s)))
 
     // live-update if Options changes settings in another tab
-    const onChanged = (changes: any, area: string) => {
+    const onChanged = (changes: Record<string, browser.Storage.StorageChange>, area: string) => {
       if (area === "sync" && changes?.settings) {
         setSettings(withDefaults(changes.settings.newValue))
       }

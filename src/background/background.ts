@@ -1,8 +1,8 @@
 export { };
-    import Browser from "webextension-polyfill";
-    import { main as scrapeNikeV1 } from "~lib/nike/v1/nikeScraper";
-    import { loadSettings } from "~lib/settings";
-    import { STORES, type StoreId } from "~lib/stores";
+import browser from "webextension-polyfill";
+import scrapeNikeV1 from "~lib/nike/v1/nikeScraper";
+import { loadSettings } from "~lib/settings";
+import { STORES, type StoreId } from "~lib/stores";
 
 async function ensureDailyBatch(){
     STORES.forEach(async store => {
@@ -11,11 +11,11 @@ async function ensureDailyBatch(){
         const today = new Date();
         const formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(); //YYYY-MM-DD format
 
-        const storeData = await Browser.storage.local.get(store.id);
+        const storeData = await browser.storage.local.get(store.id);
         const lastScrapedDate = storeData?.lastScraped ?? " ";
         
         const storageKeyValue = {lastScraped: lastScrapedDate, isActive: isActive}
-        await Browser.storage.local.set({[store.id]: storageKeyValue});
+        await browser.storage.local.set({[store.id]: storageKeyValue});
 
         if (lastScrapedDate === formattedDate) return;
         else{
@@ -33,21 +33,20 @@ async function isStoreEnabled(storeId: StoreId): Promise<boolean> {
 
 function scheduleDaily() {
   // Runs every 24h from creation time.
-  Browser.alarms.create("dailyCheck", { periodInMinutes: 1440 });
+  browser.alarms.create("dailyCheck", { periodInMinutes: 1440 });
 }
 
-Browser.runtime.onInstalled.addListener(() => {
+browser.runtime.onInstalled.addListener(() => {
     console.log("Webstore Tracker installed");
     scheduleDaily();
     ensureDailyBatch();
 });
 
-Browser.runtime.onStartup.addListener(() => {
+browser.runtime.onStartup.addListener(() => {
     console.log("Webstore Tracker startup check");
     scheduleDaily();
     ensureDailyBatch();
 });
-
-Browser.alarms.onAlarm.addListener((alarm) => {
+browser.alarms.onAlarm.addListener((alarm) => {
     if(alarm.name === "dailyCheck") ensureDailyBatch();
 });
