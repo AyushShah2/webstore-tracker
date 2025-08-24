@@ -1,3 +1,5 @@
+import type { NikeProduct } from "./nike/v1/types";
+
 import { type StoreId } from "~lib/stores";
 
 const indexedDB = globalThis.indexedDB;
@@ -55,7 +57,7 @@ async function openDB(storeName: string, storeInfo: StoreDef): Promise<IDBDataba
 }
 
 
-export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef, keyPath: string | string[], product: any): Promise<void> {
+export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef, keyPath: string | string[], product: NikeProduct): Promise<void> {
     const db = await openDB(storeName, storeInfo);
     try {
         const trxn = db.transaction(storeName, "readwrite");
@@ -80,7 +82,7 @@ export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef,
     }
 }
 
-export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key: any): Promise<any | undefined> {
+export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key: string): Promise<NikeProduct | undefined> {
     const db = await openDB(storeName, storeInfo);
     try {
         const trxn = db.transaction(storeName, "readonly");

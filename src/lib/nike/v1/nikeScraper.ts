@@ -2,7 +2,7 @@ import Browser from 'webextension-polyfill';
 import { type StoreId } from '~lib/stores';
 import { addOrUpdateProduct, getRecordByKey, type StoreDef } from '../../useDB';
 
-export async function main() {
+export async function scrapeToDB() {
 
     let today = new Date();
     let formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(); //YYYY-MM-DD format
@@ -20,7 +20,6 @@ export async function main() {
     const storageKeyValue = {lastScraped: formattedDate, isActive: true}
     await Browser.storage.local.set({[STORE_NAME]: storageKeyValue});
 
-    const startTime = today.getTime();
     const baseUrl: string = "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
     const baseParams: Record<string, any> = {
         path: '/ca/w',
@@ -28,30 +27,25 @@ export async function main() {
         anchor: 0,
         count: 100
     };
-
-    let queryString = new URLSearchParams(baseParams).toString();
-    let fullUrl = `${baseUrl}?${queryString}`;
-    let response = await fetch(fullUrl, {method: 'GET', headers: { "nike-api-caller-id": "nike:dotcom:browse:wall.client:2.0" }});
     
-    let data = await response.json();
     let count = baseParams.count;
     
     for(let anchor = 0; anchor < Infinity; anchor += count) {
-        let params: Record<string, any> = {
+        const params: Record<string, any> = {
             ...baseParams,
             anchor: anchor,
             count: count
         };
         
-        queryString = new URLSearchParams(params).toString();
-        fullUrl = `${baseUrl}?${queryString}`;
-        response = await fetch(fullUrl, {method: 'GET', headers: { "nike-api-caller-id": "nike:dotcom:browse:wall.client:2.0" }});
+        const queryString = new URLSearchParams(params).toString();
+        const fullUrl = `${baseUrl}?${queryString}`;
+        const response = await fetch(fullUrl, {method: 'GET', headers: { "nike-api-caller-id": "nike:dotcom:browse:wall.client:2.0" }});
 
         if (response.status === 400) {
             break;
         }
 
-        data = await response.json();
+        const data = await response.json();
 
         for (const group of (data?.productGroupings ?? [])) {
             for (const product of (group?.products ?? [])) {
@@ -61,15 +55,11 @@ export async function main() {
                         globalProductId: product?.globalProductId,
                         groupKey: product?.groupKey,
                         productCode: product?.productCode,
-                        priceHistory: {...productData?.priceHistory, [formattedDate]: product?.prices?.currentPrice},
+                        priceHistory: {...productData?.priceHistory, formattedDate: product?.prices?.currentPrice},
                         lastUpdated: formattedDate
                     });
                 }
             }
         }
     }
-    const elapsedTime = new Date().getTime() - startTime;
-    console.log(`Time taken: ${(elapsedTime / 1000).toFixed(2)} seconds`);
 }
-
-main().catch(console.error);
