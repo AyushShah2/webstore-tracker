@@ -1,5 +1,3 @@
-import { type StoreId } from "~lib/stores";
-
 const indexedDB = globalThis.indexedDB;
 if (!indexedDB) {
     throw new Error("IndexedDB is not available in this environment.");
@@ -13,22 +11,6 @@ export type StoreDef ={
     keyPath: string | string[];
     indexes?: Array<{name: string; keyPath: string | string[]; unique?: boolean}>;
 }
-
-export interface StoreMetadata {
-    id : StoreId;                //"nike", "ae"
-    name?: string;              //"Nike", "American Eagle"
-    isActive?: boolean;
-    lastScraped?: string;       //YYYY-MM-DD format
-}
-
-export const storesMetadataDef: StoreDef = {
-    keyPath: "id",
-    indexes: [
-        { name: "name", keyPath: "name", unique: false },
-        { name: "isActive", keyPath: "isActive", unique: false },
-        { name: "lastScraped", keyPath: "lastScraped", unique: false }
-    ]
-};
 
 async function openDB(storeName: string, storeInfo: StoreDef): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -69,7 +51,7 @@ export async function addOrUpdateProduct(storeName: string, storeInfo: StoreDef,
 
         await new Promise<void>((resolve, reject) => {
             trxn.oncomplete = () => {
-                console.log(`(${i}) Product ${product.keyPath} recorded successfully.`);
+                console.log(`(${i}) Product ${product?.(keyPath)} recorded successfully.`);
                 i++;
                 resolve();
             };

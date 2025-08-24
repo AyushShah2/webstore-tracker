@@ -1,6 +1,6 @@
 export { };
     import Browser from "webextension-polyfill";
-    import { main as scrapeNikeV1 } from "~lib/nike/v1/nikeScraper";
+    import { main as scrapeNikeV1 } from "~lib/nike/v1/scraper";
     import { loadSettings } from "~lib/settings";
     import { STORES, type StoreId } from "~lib/stores";
 
@@ -19,8 +19,13 @@ async function ensureDailyBatch(){
 
         if (lastScrapedDate === formattedDate) return;
         else{
-            console.log(lastScrapedDate);
-            await scrapeNikeV1();
+            if(store.id === "nike"){
+                console.log(lastScrapedDate);
+                await scrapeNikeV1();
+            }
+            else{
+                console.log("WRONG STORE ID")
+            }
         }
         
     });
