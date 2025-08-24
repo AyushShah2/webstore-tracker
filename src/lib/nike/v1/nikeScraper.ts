@@ -1,4 +1,4 @@
-import Browser from 'webextension-polyfill';
+import browser from 'webextension-polyfill';
 import { type StoreId } from '~lib/stores';
 import { addOrUpdateProduct, getRecordByKey, type StoreDef } from '../../useDB';
 
@@ -18,7 +18,7 @@ export default async function scrapeToDB() {
     };
 
     const storageKeyValue = {lastScraped: formattedDate, isActive: true}
-    await Browser.storage.local.set({[STORE_NAME]: storageKeyValue});
+    await browser.storage.local.set({[STORE_NAME]: storageKeyValue});
 
     const baseUrl: string = "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
     const baseParams: Record<string, any> = {
