@@ -2,7 +2,7 @@ import Browser from 'webextension-polyfill';
 import { type StoreId } from '~lib/stores';
 import { addOrUpdateProduct, getRecordByKey, type StoreDef } from '../../useDB';
 
-export async function scrapeToDB() {
+export default async function scrapeToDB() {
 
     let today = new Date();
     let formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(); //YYYY-MM-DD format
