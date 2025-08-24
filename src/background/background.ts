@@ -18,7 +18,7 @@ async function ensureDailyBatch(){
         await browser.storage.local.set({[store.id]: storageKeyValue});
 
         if (lastScrapedDate === formattedDate) return;
-        else{
+        else {
             console.log(lastScrapedDate);
             await scrapeNikeV1();
         }

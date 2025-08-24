@@ -78,7 +78,7 @@ export async function getRecordByKey(storeName: string, storeInfo: StoreDef, key
     try {
         const trxn = db.transaction(storeName, "readonly");
         const store = trxn.objectStore(storeName);
-        const result = await new Promise<any | undefined>((resolve, reject) => {
+        const result = await new Promise<Product | undefined>((resolve, reject) => {
             const request = store.get(key);
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
