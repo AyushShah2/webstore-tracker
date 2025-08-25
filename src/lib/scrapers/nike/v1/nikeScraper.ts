@@ -6,7 +6,7 @@ import {
   type StoreDef
 } from "../../../useDB"
 import type { NikeProduct } from "./types"
-import { getDateString } from "~util"
+import { getTodayDateString } from "~util"
 
 export default async function scrapeToDB() {
   const STORE_NAME: StoreId = "nike"
@@ -60,7 +60,7 @@ export default async function scrapeToDB() {
           key: product?.globalProductId,
           priceHistory: {
             ...productData?.priceHistory,
-            [getDateString()]: product?.prices?.currentPrice
+            [getTodayDateString()]: product?.prices?.currentPrice
           },
           groupKey: product?.groupKey,
           productCode: product?.productCode
