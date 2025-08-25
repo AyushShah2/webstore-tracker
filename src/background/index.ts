@@ -1,0 +1,50 @@
+import browser from "webextension-polyfill"
+
+import scrapeNikeV1 from "~lib/scrapers/nike/v1/nikeScraper"
+import { loadSettings } from "~lib/settings"
+import { STORES } from "~lib/stores"
+import { getDateString } from "~util"
+
+export {}
+
+async function ensureDailyBatch() {
+  const settings = await loadSettings()
+  STORES.forEach(async (store) => {
+    const storeId = store.id
+    const isActive: boolean = settings.enabled?.[storeId]
+    if (!isActive) return
+    const formattedDate = getDateString()
+
+    const { lastScraped } = await browser.storage.local.get({ storeId: { lastScraped: "" } })
+    console.log(lastScraped)
+
+    if (lastScraped === "" || lastScraped !== formattedDate) {
+      switch (store.id) {
+        case "nike":
+          await scrapeNikeV1()
+          browser.storage.local.set({ storeId: { lastScraped: formattedDate } })
+          break
+      }
+    } 
+  })
+}
+
+function scheduleDaily() {
+  // Runs every 24h from creation time.
+  browser.alarms.create("dailyCheck", { periodInMinutes: 1440 })
+}
+
+browser.runtime.onInstalled.addListener(() => {
+  console.log("Webstore Tracker installed")
+  scheduleDaily()
+  ensureDailyBatch()
+})
+
+browser.runtime.onStartup.addListener(() => {
+  debugger
+  ensureDailyBatch()
+})
+
+browser.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "dailyCheck") ensureDailyBatch()
+})
