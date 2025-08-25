@@ -6,11 +6,12 @@ import {
   type StoreDef
 } from "../../../useDB"
 import type { NikeProduct } from "./types"
+import { getDateString } from "~util"
 
 export default async function scrapeToDB() {
   const STORE_NAME: StoreId = "nike"
   const STORE_INFO: StoreDef = {
-    keyPath: "globalProductId",
+    keyPath: "key",
     indexes: [
       { name: "groupKey", keyPath: "groupKey", unique: false },
       { name: "productCode", keyPath: "productCode", unique: true }
@@ -59,7 +60,7 @@ export default async function scrapeToDB() {
           key: product?.globalProductId,
           priceHistory: {
             ...productData?.priceHistory,
-            formattedDate: product?.prices?.currentPrice
+            [getDateString()]: product?.prices?.currentPrice
           },
           groupKey: product?.groupKey,
           productCode: product?.productCode

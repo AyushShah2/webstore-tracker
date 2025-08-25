@@ -7,7 +7,6 @@ if (!indexedDB) {
 
 const DB_NAME = "webstore-tracker"
 const DB_VERSION = 1
-let i = 1
 // any stores database should have this structure
 export type StoreDef = {
   keyPath: string | string[]
@@ -69,8 +68,7 @@ export async function addOrUpdateProduct(
 
     await new Promise<void>((resolve, reject) => {
       trxn.oncomplete = () => {
-        console.log(`(${i}) Product ${product.key} recorded successfully.`)
-        i++
+        console.log(`Product ${product.key} recorded successfully.`)
         resolve()
       }
       trxn.onerror = () => reject(trxn.error)
