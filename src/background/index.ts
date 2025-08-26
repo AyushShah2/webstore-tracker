@@ -5,7 +5,7 @@ import { loadSettings } from "~lib/settings"
 import { STORES } from "~lib/stores"
 import { getTodayDateString } from "~util"
 
-export {}
+export { }
 
 async function ensureDailyBatch() {
   const settings = await loadSettings()
@@ -15,14 +15,14 @@ async function ensureDailyBatch() {
     if (!isActive) return
     const formattedDate = getTodayDateString()
 
-    const { lastScraped } = await browser.storage.local.get({ storeId: { lastScraped: "" } })
+    const { lastScraped } = await browser.storage.local.get({ [storeId]: { lastScraped: "" } }) as { lastScraped: string}
     console.log(lastScraped)
 
     if (lastScraped === "" || lastScraped !== formattedDate) {
-      switch (store.id) {
+      switch (storeId) {
         case "nike":
           await scrapeNikeV1()
-          browser.storage.local.set({ storeId: { lastScraped: formattedDate } })
+          browser.storage.local.set({ [storeId]: { lastScraped: formattedDate } })
           break
       }
     } 
