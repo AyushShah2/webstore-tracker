@@ -7,7 +7,7 @@ export default {
   useTabs: false,
   semi: false,
   singleQuote: false,
-  trailingComma: "none",
+  trailingComma: "es5",
   bracketSpacing: true,
   bracketSameLine: true,
   plugins: ["@ianvs/prettier-plugin-sort-imports"],
