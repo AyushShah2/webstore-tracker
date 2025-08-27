@@ -1,9 +1,6 @@
-export interface Product {
-    key: string,
-    priceHistory: Record<string, number> // key is date of format YYYY-MM-DD
-}
+import type { Product } from "~common";
 
-export interface NikeProduct extends Product{
+export interface NikeProduct extends Product {
     groupKey: string,
     productCode: string
 }

@@ -1,19 +1,15 @@
 import type { PlasmoCSConfig } from "plasmo"
+import { getGraphForItem } from "./inject/nike/graph"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.nike.com/ca/t/*"],
   css: ["./inject/general.css", "./inject/nike/extra.css"]
 }
 
-const loadHtml = 
-`<div id="injectContainer">
-  <div id="injectedLoad"></div>
-</div>`
-
 window.addEventListener("load", async () => {
-  document.getElementById("exclusionMsg").insertAdjacentHTML("beforebegin", loadHtml)
-  const injectedLoadElem = document.getElementById("injectedLoad")
-  
+  const key = document.getElementById("__NEXT_DATA__").textContent.match('"globalProductId":"(?<key>[a-z\-0-9]+)"')?.groups["key"];
+  const graph = await getGraphForItem(key)
+  document.getElementById("exclusionMsg").insertAdjacentElement("beforebegin", graph)
 })
 
 

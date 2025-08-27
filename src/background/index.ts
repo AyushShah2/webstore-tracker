@@ -1,9 +1,9 @@
 import browser from "webextension-polyfill"
 
+import { getTodayDateString } from "~common"
 import scrapeNikeV1 from "~lib/scrapers/nike/v1/nikeScraper"
 import { loadSettings } from "~lib/settings"
 import { STORES } from "~lib/stores"
-import { getTodayDateString } from "~util"
 
 export {}
 
@@ -25,7 +25,7 @@ async function ensureDailyBatch() {
           browser.storage.local.set({ storeId: { lastScraped: formattedDate } })
           break
       }
-    } 
+    }
   })
 }
 

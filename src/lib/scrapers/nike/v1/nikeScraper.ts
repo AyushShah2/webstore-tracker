@@ -1,12 +1,8 @@
+import { getTodayDateString } from "~common"
 import { type StoreId } from "~lib/stores"
 
-import {
-  addOrUpdateProduct,
-  getRecordByKey,
-  type StoreDef
-} from "../../../useDB"
+import { addOrUpdateProduct, getRecordByKey, type StoreDef } from "../../../useDB"
 import type { NikeProduct } from "./types"
-import { getTodayDateString } from "~util"
 
 export default async function scrapeToDB() {
   const STORE_NAME: StoreId = "nike"
@@ -51,11 +47,7 @@ export default async function scrapeToDB() {
 
     for (const group of data?.productGroupings ?? []) {
       for (const product of group?.products ?? []) {
-        const productData = await getRecordByKey(
-          STORE_NAME,
-          STORE_INFO,
-          product?.globalProductId
-        )
+        const productData = await getRecordByKey(STORE_NAME, STORE_INFO, product?.globalProductId)
         await addOrUpdateProduct(STORE_NAME, STORE_INFO, {
           key: product?.globalProductId,
           priceHistory: {

@@ -1,4 +1,4 @@
-import type { Product } from "./scrapers/nike/v1/types"
+import type { Product } from "~common"
 
 const indexedDB = globalThis.indexedDB
 if (!indexedDB) {
