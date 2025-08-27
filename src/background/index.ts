@@ -15,14 +15,13 @@ async function ensureDailyBatch() {
     if (!isActive) return
     const formattedDate = getTodayDateString()
 
-    const { lastScraped } = await browser.storage.local.get({ storeId: { lastScraped: "" } })
-    console.log(lastScraped)
+    const { lastScraped } = await browser.storage.local.get({ [storeId]: { lastScraped: "" } }) as { lastScraped: string }
 
     if (lastScraped === "" || lastScraped !== formattedDate) {
       switch (store.id) {
         case "nike":
           await scrapeNikeV1()
-          browser.storage.local.set({ storeId: { lastScraped: formattedDate } })
+          browser.storage.local.set({ [storeId]: { lastScraped: formattedDate } })
           break
       }
     }
