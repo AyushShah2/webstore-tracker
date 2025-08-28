@@ -1,6 +1,7 @@
 export interface Product {
     key: string,
     priceHistory: Record<string, number> // key is date of format YYYY-MM-DD
+    link: string
 }
 
 // YYYY-MM-DD format

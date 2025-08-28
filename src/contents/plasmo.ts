@@ -9,7 +9,7 @@ export const config: PlasmoCSConfig = {
 window.addEventListener("load", async () => {
   const key = document.getElementById("__NEXT_DATA__").textContent.match('"globalProductId":"(?<key>[a-z\-0-9]+)"')?.groups["key"];
   const graph = await getGraphForItem(key)
-  document.getElementById("exclusionMsg").insertAdjacentElement("beforebegin", graph)
+  document.querySelector("div[data-testid='favorite-button']").insertAdjacentElement("beforebegin", graph)
 })
 
 

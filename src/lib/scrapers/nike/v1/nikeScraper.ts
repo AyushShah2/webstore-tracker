@@ -45,8 +45,8 @@ export default async function scrapeToDB() {
 
     const data = await response.json()
 
-    for (const group of data?.productGroupings ?? []) {
-      for (const product of group?.products ?? []) {
+    for (const group of data?.productGroupings) {
+      for (const product of group?.products) {
         const productData = await getRecordByKey(STORE_NAME, STORE_INFO, product?.globalProductId)
         await addOrUpdateProduct(STORE_NAME, STORE_INFO, {
           key: product?.globalProductId,
@@ -55,7 +55,8 @@ export default async function scrapeToDB() {
             [getTodayDateString()]: product?.prices?.currentPrice
           },
           groupKey: product?.groupKey,
-          productCode: product?.productCode
+          productCode: product?.productCode,
+          link: product?.pdpUrl?.url
         } as NikeProduct)
       }
     }
