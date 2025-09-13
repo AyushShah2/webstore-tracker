@@ -5,7 +5,7 @@ import { NikeScraper } from "~lib/scrapers/nike/v1/nikeScraper"
 import { loadSettings } from "~lib/settings/settings"
 import { STORES } from "~lib/settings/stores"
 
-export {}
+export { }
 
 async function ensureDailyBatch() {
   const settings = await loadSettings()
@@ -18,7 +18,7 @@ async function ensureDailyBatch() {
     const { lastScraped } = (await browser.storage.local.get({ [storeId]: { lastScraped: "" } })) as { lastScraped: string }
 
     if (lastScraped === "" || lastScraped !== formattedDate) {
-      switch (store.id) {
+      switch (storeId) {
         case "nike":
           await new NikeScraper().scrape()
           browser.storage.local.set({ [storeId]: { lastScraped: formattedDate } })
