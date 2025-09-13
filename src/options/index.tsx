@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
+
+import { loadSettings, saveSettings, withDefaults, type Settings } from "~lib/settings/settings"
+import { STORES } from "~lib/settings/stores"
+
 import "./options.css"
-import { STORES } from "~lib/stores"
-import { loadSettings, saveSettings, withDefaults, type Settings } from "~lib/settings"
 
 export default function Options() {
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -35,18 +37,12 @@ export default function Options() {
 
         <section className="list">
           {STORES.map((s) => {
-            const checked = (settings.enabled?.[s.id] ?? s.enabledByDefault ?? true)
+            const checked = settings.enabled?.[s.id] ?? s.enabledByDefault ?? true
             return (
               <label key={s.id} className="row">
                 <span className="store">{s.name}</span>
                 <span className="toggle">
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-label={`Enable ${s.name}`}
-                    checked={checked}
-                    onChange={() => onToggle(s.id)}
-                  />
+                  <input type="checkbox" role="switch" aria-label={`Enable ${s.name}`} checked={checked} onChange={() => onToggle(s.id)} />
                   <span className="slider" aria-hidden />
                 </span>
               </label>
@@ -54,7 +50,9 @@ export default function Options() {
           })}
         </section>
 
-        <div aria-live="polite" className="saveHint">{saving ? "Saving…" : "Saved"}</div>
+        <div aria-live="polite" className="saveHint">
+          {saving ? "Saving…" : "Saved"}
+        </div>
       </div>
     </main>
   )

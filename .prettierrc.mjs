@@ -2,12 +2,12 @@
  * @type {import('prettier').Options}
  */
 export default {
-  printWidth: 130,
+  printWidth: 150,
   tabWidth: 2,
   useTabs: false,
   semi: false,
   singleQuote: false,
-  trailingComma: "none",
+  trailingComma: "all",
   bracketSpacing: true,
   bracketSameLine: true,
   plugins: ["@ianvs/prettier-plugin-sort-imports"],

@@ -1,71 +1,58 @@
-import { type StoreId } from "~lib/stores"
+import { getTodayDateString } from "~lib/common";
+import { NikeDB, type NikeProduct } from "~lib/db/nikeDB";
+import { BaseScraper } from "~lib/scrapers/BaseScraper";
 
-import {
-  addOrUpdateProduct,
-  getRecordByKey,
-  type StoreDef
-} from "../../../useDB"
-import type { NikeProduct } from "./types"
-import { getTodayDateString } from "~util"
+export class NikeScraper extends BaseScraper<NikeProduct> {
+    private readonly BASE_URL: string
+    private readonly BASE_PARAMS: object
+    private static readonly COUNT = 100
 
-export default async function scrapeToDB() {
-  const STORE_NAME: StoreId = "nike"
-  const STORE_INFO: StoreDef = {
-    keyPath: "key",
-    indexes: [
-      { name: "groupKey", keyPath: "groupKey", unique: false },
-      { name: "productCode", keyPath: "productCode", unique: true }
-    ]
-  }
-
-  const baseUrl: string =
-    "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
-  const baseParams: Record<string, any> = {
-    path: "/ca/w",
-    queryType: "PRODUCTS",
-    anchor: 0,
-    count: 100
-  }
-
-  let count = baseParams.count
-
-  for (let anchor = 0; anchor < Infinity; anchor += count) {
-    const params: Record<string, any> = {
-      ...baseParams,
-      anchor: anchor,
-      count: count
+    constructor() {
+        super(new NikeDB());
+        this.BASE_URL = "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
+        this.BASE_PARAMS = { path: "/ca/w", queryType: "PRODUCTS" }
     }
 
-    const queryString = new URLSearchParams(params).toString()
-    const fullUrl = `${baseUrl}?${queryString}`
-    const response = await fetch(fullUrl, {
-      method: "GET",
-      headers: { "nike-api-caller-id": "nike:dotcom:browse:wall.client:2.0" }
-    })
-
-    if (response.status === 400) {
-      break
+    private async getNikeProductInfo(anchor: number, count: number): Promise<Response> {
+        const params = { ...this.BASE_PARAMS, anchor: `${anchor}`, count: `${count}` }
+        const queryString = new URLSearchParams(params).toString()
+        const fullUrl = `${this.BASE_URL}?${queryString}`
+        return await fetch(fullUrl, {
+            method: "GET",
+            headers: { "nike-api-caller-id": "nike:dotcom:browse:wall.client:2.0" },
+        })
     }
 
-    const data = await response.json()
+    protected async getData(): Promise<Record<string, unknown>[]> {
+        let total: number;
+        let products: Record<string, unknown>[] = []
 
-    for (const group of data?.productGroupings ?? []) {
-      for (const product of group?.products ?? []) {
-        const productData = await getRecordByKey(
-          STORE_NAME,
-          STORE_INFO,
-          product?.globalProductId
-        )
-        await addOrUpdateProduct(STORE_NAME, STORE_INFO, {
-          key: product?.globalProductId,
-          priceHistory: {
-            ...productData?.priceHistory,
-            [getTodayDateString()]: product?.prices?.currentPrice
-          },
-          groupKey: product?.groupKey,
-          productCode: product?.productCode
-        } as NikeProduct)
-      }
+        let anchor: number = 0;
+        do {
+            const response = await (await this.getNikeProductInfo(anchor, NikeScraper.COUNT)).json()
+            if (!total) { total = response?.pages?.totalResources }
+            for (const group of response.productGroupings ?? []) {
+                products = products.concat(group?.products)
+            }
+            
+            anchor += NikeScraper.COUNT
+        } while (anchor < total)
+        return products
     }
-  }
+
+    protected parseData(data: Record<string, unknown>): NikeProduct {
+        return {
+            key: data?.globalProductId,
+            priceHistory: {
+                [getTodayDateString()]: (data?.prices as { currentPrice: number })?.currentPrice,
+            },
+            groupKey: data?.groupKey,
+            productCode: data?.productCode,
+            link: (data?.pdpUrl as { url: string })?.url,
+        } as NikeProduct
+    }
+
+    protected mergeData(parsedData: NikeProduct, oldData: NikeProduct): NikeProduct {
+        return {...parsedData, priceHistory: { ...oldData?.priceHistory, ...parsedData.priceHistory }}
+    }
 }

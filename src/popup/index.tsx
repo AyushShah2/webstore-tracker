@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
+import browser from "webextension-polyfill"
+
+import { loadSettings, withDefaults, type Settings } from "~lib/settings/settings"
+import { STORES } from "~lib/settings/stores"
+
 import "./popup.css"
-import { STORES } from "~lib/stores"
-import { loadSettings, withDefaults, type Settings } from "~lib/settings"
-import browser from 'webextension-polyfill'
 
 export default function Popup() {
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -39,7 +41,9 @@ export default function Popup() {
     <main className="popup">
       <div className="heading">Webstore Tracker</div>
 
-      <button className="btn" onClick={openOptions}>Open Options</button>
+      <button className="btn" onClick={openOptions}>
+        Open Options
+      </button>
 
       <div className="subheading">Stores</div>
       <ul className="list">

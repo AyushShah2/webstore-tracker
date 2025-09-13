@@ -1,9 +1,9 @@
 import browser from "webextension-polyfill"
 
-import scrapeNikeV1 from "~lib/scrapers/nike/v1/nikeScraper"
-import { loadSettings } from "~lib/settings"
-import { STORES } from "~lib/stores"
-import { getTodayDateString } from "~util"
+import { getTodayDateString } from "~lib/common"
+import { NikeScraper } from "~lib/scrapers/nike/v1/nikeScraper"
+import { loadSettings } from "~lib/settings/settings"
+import { STORES } from "~lib/settings/stores"
 
 export { }
 
@@ -15,17 +15,16 @@ async function ensureDailyBatch() {
     if (!isActive) return
     const formattedDate = getTodayDateString()
 
-    const { lastScraped } = await browser.storage.local.get({ [storeId]: { lastScraped: "" } }) as { lastScraped: string}
-    console.log(lastScraped)
+    const { lastScraped } = (await browser.storage.local.get({ [storeId]: { lastScraped: "" } })) as { lastScraped: string }
 
     if (lastScraped === "" || lastScraped !== formattedDate) {
       switch (storeId) {
         case "nike":
-          await scrapeNikeV1()
+          await new NikeScraper().scrape()
           browser.storage.local.set({ [storeId]: { lastScraped: formattedDate } })
           break
       }
-    } 
+    }
   })
 }
 
