@@ -1,9 +1,9 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { getGraphForItem } from "./inject/nike/graph"
+import { getGraphForItem } from "./inject/graph"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.nike.com/ca/t/*"],
-  css: ["./inject/general.css", "./inject/nike/extra.css"]
+  css: ["./inject/nike/extra.css"]
 }
 
 window.addEventListener("load", async () => {

@@ -5,13 +5,12 @@ import { BaseScraper } from "~lib/scrapers/BaseScraper";
 export class NikeScraper extends BaseScraper<NikeProduct> {
     private readonly BASE_URL: string
     private readonly BASE_PARAMS: object
-    private readonly COUNT: number
+    private static readonly COUNT = 100
 
     constructor() {
         super(new NikeDB());
         this.BASE_URL = "https://api.nike.com/discover/product_wall/v1/marketplace/CA/language/en-GB/consumerChannelId/d9a5bc42-4b9c-4976-858a-f159cf99c647"
         this.BASE_PARAMS = { path: "/ca/w", queryType: "PRODUCTS" }
-        this.COUNT = 100
     }
 
     private async getNikeProductInfo(anchor: number, count: number): Promise<Response> {
@@ -30,13 +29,13 @@ export class NikeScraper extends BaseScraper<NikeProduct> {
 
         let anchor: number = 0;
         do {
-            const response = await (await this.getNikeProductInfo(anchor, this.COUNT)).json()
+            const response = await (await this.getNikeProductInfo(anchor, NikeScraper.COUNT)).json()
             if (!total) { total = response?.pages?.totalResources }
-            for (const group of response?.productGroupings) {
+            for (const group of response.productGroupings ?? []) {
                 products = products.concat(group?.products)
             }
             
-            anchor += this.COUNT
+            anchor += NikeScraper.COUNT
         } while (anchor < total)
         return products
     }
