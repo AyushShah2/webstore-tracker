@@ -10,12 +10,10 @@ export async function getGraphForItem(key: string) {
     return Plot.plot({
         height: 500,
         width: 500,
-        x: { label: "Date" },
+        x: { label: "Date", labelArrow: null },
         y: { label: "Price", grid: true },
         marks: [
             Plot.line(dateToPrice, { stroke: "steelblue", tip: true })
         ]
     })
-
-    //return Plot.line(dateToPrice, { stroke: "steelblue", tip: true }).plot({y: { grid: true }, height: 500, width: 500})
 }
