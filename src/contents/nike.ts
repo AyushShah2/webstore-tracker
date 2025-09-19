@@ -7,7 +7,13 @@ export const config: PlasmoCSConfig = {
 }
 
 window.addEventListener("load", async () => {
-  const key = document.getElementById("__NEXT_DATA__").textContent.match('"globalProductId":"(?<key>[a-z\-0-9]+)"')?.groups["key"];
+  const variantData = JSON.parse(document.getElementById("__NEXT_DATA__").textContent)?.props?.pageProps?.colorwayImages
+  let key: string;
+  for (const variant of variantData) {
+    if (variant?.pdpUrl === location.href) {
+      key = variant?.globalProductId
+    }
+  }
   const graph = await getGraphForItem(key)
   document.querySelector("div[data-testid='favorite-button']").insertAdjacentElement("beforebegin", graph)
 })
