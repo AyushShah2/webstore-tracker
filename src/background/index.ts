@@ -39,11 +39,6 @@ browser.runtime.onInstalled.addListener(() => {
   ensureDailyBatch()
 })
 
-// Just for testing, should remove
-browser.runtime.onStartup.addListener(() => {
-  ensureDailyBatch()
-})
-
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "dailyCheck") ensureDailyBatch()
 })
