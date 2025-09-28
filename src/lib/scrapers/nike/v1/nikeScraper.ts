@@ -1,6 +1,6 @@
 import { getTodayDateString } from "~lib/common";
 import { NikeDB, type NikeProduct } from "~lib/db/nikeDB";
-import { BaseScraper } from "~lib/scrapers/BaseScraper";
+import { BaseScraper } from "~lib/scrapers/baseScraper";
 
 export class NikeScraper extends BaseScraper<NikeProduct> {
     private readonly BASE_URL: string

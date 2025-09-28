@@ -6,6 +6,8 @@
   "author": "Ayush Shah, Eric Song",
   "scripts": {
     "dev": "plasmo dev",
+    "dev-edge": "plasmo dev --target=edge-mv3",
+    "dev-firefox": "plasmo dev --target=firefox-mv3",
     "build": "plasmo build",
     "package": "plasmo package"
   },
