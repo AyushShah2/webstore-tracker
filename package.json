@@ -5,6 +5,7 @@
   "description": "A browser extension that will track the prices of all products in any webstore.",
   "author": "Ayush Shah, Eric Song",
   "scripts": {
+    "prepare": "husky",
     "dev": "plasmo dev",
     "dev-edge": "plasmo dev --target=edge-mv3",
     "dev-firefox": "plasmo dev --target=firefox-mv3",
@@ -25,9 +26,15 @@
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
     "@types/webextension-polyfill": "^0.12.3",
+    "husky": "^9.1.7",
     "prettier": "3.2.4",
     "typescript": "5.3.3",
     "webextension-polyfill": "^0.12.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": [
+      "prettier --write"
+    ]
   },
   "pnpm": {
     "peerDependencyRules": {

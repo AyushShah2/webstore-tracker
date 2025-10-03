@@ -5,22 +5,28 @@ export interface Product extends DBItem {
   link: string
 }
 
+export interface ScraperDBSpec {
+  storeName: string
+  version: number
+  indexes: IndexProps[]
+}
+
 export class ScraperDB<T extends Product> {
   private db: BaseDB<T>
-  private DB_NAME = "webstore-tracker"
+  private static DB_NAME = "webstore-tracker"
   private storeName: string
   private version: number
   private indexes: IndexProps[]
 
-  constructor(storeName: string, version: number, indexes?: IndexProps[]) {
-    this.storeName = storeName
-    this.version = version
-    this.indexes = indexes
+  constructor(spec: ScraperDBSpec) {
+    this.storeName = spec.storeName
+    this.version = spec.version
+    this.indexes = spec.indexes
   }
 
   private async init(): Promise<void> {
     if (!this.db) {
-      this.db = await BaseDB.getBaseDB(this.DB_NAME, this.version, [{ name: this.storeName, indexes: this.indexes }])
+      this.db = await BaseDB.getBaseDB(ScraperDB.DB_NAME, this.version, [{ name: this.storeName, indexes: this.indexes }])
     }
   }
 
