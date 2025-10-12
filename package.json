@@ -15,6 +15,7 @@
   "dependencies": {
     "@observablehq/plot": "^0.6.17",
     "@plasmohq/messaging": "^0.7.2",
+    "cheerio": "^1.1.2",
     "plasmo": "0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -25,7 +26,7 @@
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
-    "@types/webextension-polyfill": "^0.12.3",
+    "@types/webextension-polyfill": "^0.12.4",
     "husky": "^9.1.7",
     "prettier": "3.2.4",
     "typescript": "5.3.3",

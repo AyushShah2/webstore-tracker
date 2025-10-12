@@ -1,0 +1,22 @@
+#expand-graph {
+    position: absolute;
+    background: transparent;
+    border: 0;
+    top: 0;
+    right: -1.5rem;
+}
+
+#graph-div {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+}
+
+#screen-cover {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 100000;
+}

@@ -1,13 +1,20 @@
-import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo"
+import styleText from "data-text:../inject/graph.css"
+import type { PlasmoCSConfig, PlasmoGetInlineAnchor, PlasmoGetStyle } from "plasmo"
 import { useState } from "react"
 
 import { NikeSpec } from "~lib/db/nikeDB"
 
-import Graph from "./inject/graph"
+import Graph from "../inject/graph"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.nike.com/ca/t/*"],
-  css: ["./inject/nike/extra.css"],
+  css: ["../inject/nike/extra.css"],
+}
+
+export const getStyle: PlasmoGetStyle = () => {
+  const style = document.createElement("style")
+  style.textContent = styleText
+  return style
 }
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => ({
@@ -32,5 +39,5 @@ export default function NikeGraph() {
     elem.addEventListener("click", () => setKey(getKey(elem.href)))
   }
 
-  return <Graph productKey={key} spec={NikeSpec} />
+  return <Graph productKey={key} spec={NikeSpec} expandable={true} />
 }
