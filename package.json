@@ -13,9 +13,10 @@
     "package": "plasmo package"
   },
   "dependencies": {
-    "@observablehq/plot": "^0.6.17",
     "@plasmohq/messaging": "^0.7.2",
-    "cheerio": "^1.1.2",
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-dayjs-4": "^1.0.4",
+    "dayjs": "^1.11.18",
     "plasmo": "0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
