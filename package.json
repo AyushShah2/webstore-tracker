@@ -43,6 +43,9 @@
       "allowedVersions": {
         "svgo": "2.8.0"
       }
+    },
+    "patchedDependencies": {
+      "@plasmohq/parcel-transformer-manifest": "patches/@plasmohq__parcel-transformer-manifest.patch"
     }
   },
   "manifest": {
@@ -64,6 +67,9 @@
       "gecko": {
         "id": "@webstore-tracker"
       }
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self';object-src 'self';"
     }
   },
   "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"

@@ -12,6 +12,7 @@ import type { Product, ScraperDBSpec } from "~lib/db/scraperDB"
 export default function Graph({ productKey, spec, expandable }: { productKey: string; spec: ScraperDBSpec; expandable?: boolean }) {
   const graphDiv = useRef<HTMLDivElement>()
   const [showPopup, setShowPopup] = useState(false)
+  const maxOutStyle = { position: "relative", width: "100%", height: "100%" } as React.CSSProperties
 
   useEffect(() => {
     let canvas: HTMLCanvasElement = null
@@ -33,8 +34,8 @@ export default function Graph({ productKey, spec, expandable }: { productKey: st
 
   return (
     <>
-      <div id="graph-div">
-        <div ref={graphDiv}></div>
+      <div style={maxOutStyle}>
+        <div style={maxOutStyle} ref={graphDiv}></div>
         {expandable && (
           <>
             <button id="expand-graph" onClick={() => setShowPopup(true)}>
@@ -61,57 +62,64 @@ function RenderInWindow({ open, setOpen, width, height, children }) {
 
   useEffect(() => {
     // If open, create window and store in ref
-    if (open) {
-      _window.current = window.open("", "", `width=${width},height=${height},left=0,top=0,popup`)
+    setTimeout(() => {
+      if (open) {
+        _window.current = window.open("", "", `width=${width},height=${height},left=0,top=0,popup`)
 
-      const curWindow = _window.current
+        const curWindow = _window.current
 
-      curWindow.onbeforeunload = () => {
+        curWindow.onbeforeunload = () => {
+          setReady(false)
+          setOpen(false)
+        }
+
+        // Popup window is ready
+        setReady(true)
+        // Return cleanup function
+      } else {
+        // If window is requested to be closed via "open" prop being set to false
+        _window.current?.close()
         setReady(false)
-        setOpen(false)
       }
-
-      // Popup window is ready
-      setReady(true)
-      // Return cleanup function
-    } else {
-      // If window is requested to be closed via "open" prop being set to false
-      _window.current?.close()
-      setReady(false)
-    }
+    }, 0)
   }, [open])
 
   return open && ready && createPortal(children, _window.current?.document.body)
 }
 
 async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: ScraperDBSpec) {
-  const priceData = ((await sendToBackground({ name: "getItem", body: { key: key, spec: spec } })).item as Product).priceHistory
-  console.log(priceData)
-  new Chart(canvas, {
-    type: "line",
-    data: {
-      datasets: [
-        {
-          label: "Price",
-          data: Object.entries(priceData).map((datapoint) => {
-            return { x: datapoint[0], y: datapoint[1] }
-          }),
-        },
-      ],
-    },
-    options: {
-      scales: {
-        x: {
-          type: "time",
-          time: {
-            unit: "day",
-            tooltipFormat: "dddd, MMMM DD, YYYY",
+  const priceData = ((await sendToBackground({ name: "getItem", body: { key: key, spec: spec } })).item as Product)?.priceHistory
+  if (priceData) {
+    new Chart(canvas, {
+      type: "line",
+      data: {
+        datasets: [
+          {
+            label: "Price",
+            data: Object.entries(priceData).map((datapoint) => {
+              return { x: datapoint[0], y: datapoint[1] }
+            }),
+          },
+        ],
+      },
+      options: {
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: "day",
+              tooltipFormat: "dddd, MMMM DD, YYYY",
+            },
+          },
+          y: {
+            min: 0,
           },
         },
-        y: {
-          min: 0,
-        },
+        maintainAspectRatio: false,
       },
-    },
-  })
+    })
+  }
+
+  // if priceData is undefined, then return false, o/w return true
+  return !!priceData
 }

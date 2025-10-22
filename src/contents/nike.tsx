@@ -1,4 +1,4 @@
-import styleText from "data-text:../inject/graph.css"
+import styleText from "data-text:~inject/graph.css"
 import type { PlasmoCSConfig, PlasmoGetInlineAnchor, PlasmoGetStyle } from "plasmo"
 import { useState } from "react"
 
