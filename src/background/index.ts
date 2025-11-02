@@ -33,9 +33,10 @@ function scheduleDaily() {
   browser.alarms.create("dailyCheck", { periodInMinutes: 1440 })
 }
 
-browser.runtime.onStartup.addListener(() => {
-  ensureDailyBatch()
-})
+// Only uncomment for debugging
+// browser.runtime.onStartup.addListener(() => {
+//   ensureDailyBatch()
+// })
 
 browser.runtime.onInstalled.addListener(() => {
   console.log("Webstore Tracker installed")
