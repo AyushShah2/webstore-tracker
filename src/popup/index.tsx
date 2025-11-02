@@ -16,7 +16,7 @@ export default function Popup() {
     // live-update if Options changes settings in another tab
     const onChanged = (changes: Record<string, browser.Storage.StorageChange>, area: string) => {
       if (area === "sync" && changes?.settings) {
-        setSettings(withDefaults(changes.settings.newValue))
+        setSettings(withDefaults(changes.settings.newValue as Partial<Settings>))
       }
     }
     browser.storage.onChanged.addListener(onChanged)

@@ -10,17 +10,19 @@ import { sendToBackground } from "@plasmohq/messaging"
 import type { Product, ScraperDBSpec } from "~lib/db/scraperDB"
 
 export default function Graph({ productKey, spec, expandable }: { productKey: string; spec: ScraperDBSpec; expandable?: boolean }) {
-  const graphDiv = useRef<HTMLDivElement>()
+  const graphDiv = useRef<HTMLDivElement | null>(null)
   const [showPopup, setShowPopup] = useState(false)
   const maxOutStyle = { position: "relative", width: "100%", height: "100%" } as React.CSSProperties
 
   useEffect(() => {
-    let canvas: HTMLCanvasElement = null
+    let canvas: HTMLCanvasElement | null = null
 
     async function getAndAddGraph() {
-      canvas = document.createElement("canvas")
-      graphDiv.current.append(canvas)
-      await setGraphForItem(canvas, productKey, spec)
+      if (graphDiv.current) {
+        canvas = document.createElement("canvas")
+        graphDiv.current.append(canvas)
+        await setGraphForItem(canvas, productKey, spec)
+      }
     }
     getAndAddGraph()
 
@@ -36,7 +38,7 @@ export default function Graph({ productKey, spec, expandable }: { productKey: st
     <>
       <div style={maxOutStyle}>
         <div style={maxOutStyle} ref={graphDiv}></div>
-        {expandable && (
+        {expandable && process.env.PLASMO_BROWSER !== "firefox" && (
           <>
             <button id="expand-graph" onClick={() => setShowPopup(true)}>
               <svg width="24px" height="24px" viewBox="0 0 16 16" version="1.1">
@@ -57,37 +59,34 @@ export default function Graph({ productKey, spec, expandable }: { productKey: st
 
 // from https://stackoverflow.com/a/64391469
 function RenderInWindow({ open, setOpen, width, height, children }) {
-  const _window = useRef(null)
+  const _window = useRef<Window | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // If open, create window and store in ref
-    setTimeout(() => {
-      if (open) {
-        _window.current = window.open("", "", `width=${width},height=${height},left=0,top=0,popup`)
+    if (open) {
+      const newWindow = window.open("", "", `width=${width},height=${height},left=0,top=0,popup`)
 
-        const curWindow = _window.current
-
-        curWindow.onbeforeunload = () => {
+      if (newWindow) {
+        newWindow.onbeforeunload = () => {
           setReady(false)
           setOpen(false)
         }
 
         // Popup window is ready
         setReady(true)
-        // Return cleanup function
-      } else {
-        // If window is requested to be closed via "open" prop being set to false
-        _window.current?.close()
-        setReady(false)
+        _window.current = newWindow
       }
-    }, 0)
+    } else {
+      // If window is requested to be closed via "open" prop being set to false
+      _window.current?.close()
+      setReady(false)
+    }
   }, [open])
 
-  return open && ready && createPortal(children, _window.current?.document.body)
+  return open && ready && _window.current && createPortal(children, _window.current.document.body)
 }
 
-async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: ScraperDBSpec) {
+async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: ScraperDBSpec): Promise<boolean> {
   const priceData = ((await sendToBackground({ name: "getItem", body: { key: key, spec: spec } })).item as Product)?.priceHistory
   if (priceData) {
     new Chart(canvas, {

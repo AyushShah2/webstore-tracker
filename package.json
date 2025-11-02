@@ -10,7 +10,8 @@
     "dev-edge": "plasmo dev --target=edge-mv3",
     "dev-firefox": "plasmo dev --target=firefox-mv3",
     "build": "plasmo build",
-    "package": "plasmo package"
+    "package": "plasmo package",
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,html,json}\""
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.7.2",
@@ -34,7 +35,7 @@
     "webextension-polyfill": "^0.12.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": [
+    "*.{js,jsx,ts,tsx,html,json}": [
       "prettier --write"
     ]
   },
@@ -67,7 +68,15 @@
       "gecko": {
         "id": "@webstore-tracker"
       }
-    }
+    },
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "src/inject/expandedGraph.html"
+        ],
+        "matches": []
+      }
+    ]
   },
   "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }

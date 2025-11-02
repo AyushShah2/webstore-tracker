@@ -30,22 +30,22 @@ export class ScraperDB<T extends Product> {
     }
   }
 
-  async addOrUpdateProduct(item: T): Promise<void> {
+  async addOrUpdateProduct(item: T): Promise<boolean> {
     await this.init()
     return this.db.addOrUpdateItem(this.storeName, item)
   }
 
-  async getProductByKey(key: string): Promise<T> {
+  async getProductByKey(key: string): Promise<T | null> {
     await this.init()
     return this.db.getItemByKey(this.storeName, key)
   }
 
-  async getRecordByIndex(indexName: string, key: string): Promise<T> {
+  async getRecordByIndex(indexName: string, key: string): Promise<T | null> {
     await this.init()
     return this.db.getItemByIndex(this.storeName, indexName, key)
   }
 
-  async size(): Promise<number> {
+  async size(): Promise<number | null> {
     await this.init()
     return this.db.size(this.storeName)
   }

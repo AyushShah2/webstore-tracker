@@ -26,13 +26,13 @@ export class NikeScraper extends BaseScraper<NikeProduct> {
   }
 
   protected async getData(): Promise<Record<string, unknown>[]> {
-    let total: number
+    let total: number = -1
     let products: Record<string, unknown>[] = []
 
     let anchor: number = 0
     do {
       const response = await (await this.getNikeProductInfo(anchor, NikeScraper.COUNT)).json()
-      if (!total) {
+      if (total < 0) {
         total = response?.pages?.totalResources
       }
       for (const group of response.productGroupings ?? []) {
@@ -56,7 +56,7 @@ export class NikeScraper extends BaseScraper<NikeProduct> {
     } as NikeProduct
   }
 
-  protected mergeData(parsedData: NikeProduct, oldData: NikeProduct): NikeProduct {
+  protected mergeData(parsedData: NikeProduct, oldData: NikeProduct | null): NikeProduct {
     return { ...parsedData, priceHistory: { ...oldData?.priceHistory, ...parsedData.priceHistory } }
   }
 }
