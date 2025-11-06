@@ -9,6 +9,7 @@
     "dev": "plasmo dev",
     "dev-edge": "plasmo dev --target=edge-mv3",
     "dev-firefox": "plasmo dev --target=firefox-mv3",
+    "zip-firefox": "node ./zipBundle.mjs ./build/firefox-mv3-dev ./build firefox-mv3-dev",
     "build": "plasmo build",
     "package": "plasmo package",
     "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,html,json}\""
@@ -29,6 +30,8 @@
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
     "@types/webextension-polyfill": "^0.12.4",
+    "fast-glob": "^3.3.3",
+    "fflate": "^0.8.2",
     "husky": "^9.1.7",
     "prettier": "3.2.4",
     "typescript": "5.3.3",

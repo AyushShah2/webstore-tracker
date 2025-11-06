@@ -86,8 +86,8 @@ function RenderInWindow({ open, setOpen, width, height, children }) {
   return open && ready && _window.current && createPortal(children, _window.current.document.body)
 }
 
-async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: ScraperDBSpec): Promise<boolean> {
-  const priceData = ((await sendToBackground({ name: "getItem", body: { key: key, spec: spec } })).item as Product)?.priceHistory
+async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: ScraperDBSpec) {
+  const priceData = ((await sendToBackground({ name: "getItem", body: { key: key, spec: spec } })).item as Product | null)?.priceHistory
   if (priceData) {
     new Chart(canvas, {
       type: "line",
@@ -117,8 +117,11 @@ async function setGraphForItem(canvas: HTMLCanvasElement, key: string, spec: Scr
         maintainAspectRatio: false,
       },
     })
+  } else {
+    const ctx = canvas.getContext("2d")
+    if (ctx) {
+      ctx.textAlign = "center"
+      ctx.fillText("Data is not avaliable yet, try again later.", canvas.width / 2, canvas.height / 2)
+    }
   }
-
-  // if priceData is undefined, then return false, o/w return true
-  return !!priceData
 }

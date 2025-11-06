@@ -53,6 +53,12 @@ importers:
       '@types/webextension-polyfill':
         specifier: ^0.12.4
         version: 0.12.4
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
+      fflate:
+        specifier: ^0.8.2
+        version: 0.8.2
       husky:
         specifier: ^9.1.7
         version: 9.1.7
