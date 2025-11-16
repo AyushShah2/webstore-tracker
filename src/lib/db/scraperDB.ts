@@ -1,4 +1,4 @@
-import { BaseDB, type DBItem, type IndexProps } from "./baseDB"
+import { BaseDB, type DBItem, type DBUpgrader, type IndexProps } from "./baseDB"
 
 export interface Product extends DBItem {
   priceHistory: Record<string, number> // key is date of format YYYY-MM-DD
@@ -8,7 +8,8 @@ export interface Product extends DBItem {
 export interface ScraperDBSpec {
   storeName: string
   version: number
-  indexes: IndexProps[]
+  indexes?: IndexProps[]
+  dbUpgrader?: DBUpgrader
 }
 
 export class ScraperDB<T extends Product> {
@@ -16,37 +17,39 @@ export class ScraperDB<T extends Product> {
   private static DB_NAME = "webstore-tracker"
   private storeName: string
   private version: number
-  private indexes: IndexProps[]
+  private upgrader: DBUpgrader | undefined
+  private indexes: IndexProps[] | undefined
 
   constructor(spec: ScraperDBSpec) {
     this.storeName = spec.storeName
     this.version = spec.version
-    this.indexes = spec.indexes
+    this.indexes = spec?.indexes
+    this.upgrader = spec?.dbUpgrader
   }
 
-  private async init(): Promise<void> {
+  async init(): Promise<void> {
     if (!this.db) {
-      this.db = await BaseDB.getBaseDB(ScraperDB.DB_NAME, this.version, [{ name: this.storeName, indexes: this.indexes }])
+      this.db = await BaseDB.getBaseDB(ScraperDB.DB_NAME, this.version, [{ name: this.storeName, indexes: this.indexes }], this.upgrader)
     }
   }
 
+  ready(): boolean {
+    return !!this.db
+  }
+
   async addOrUpdateProduct(item: T): Promise<boolean> {
-    await this.init()
     return this.db.addOrUpdateItem(this.storeName, item)
   }
 
   async getProductByKey(key: string): Promise<T | null> {
-    await this.init()
     return this.db.getItemByKey(this.storeName, key)
   }
 
   async getRecordByIndex(indexName: string, key: string): Promise<T | null> {
-    await this.init()
     return this.db.getItemByIndex(this.storeName, indexName, key)
   }
 
   async size(): Promise<number | null> {
-    await this.init()
     return this.db.size(this.storeName)
   }
 }

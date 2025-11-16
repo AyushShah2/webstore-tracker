@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
 import { getTodayDateString } from "~lib/common"
-import { NikeScraper } from "~lib/scrapers/nike/v1/nikeScraper"
+import { NikeScraper } from "~lib/scrapers/nikeScraper"
 import { loadSettings } from "~lib/settings/settings"
 import { STORES } from "~lib/settings/stores"
 

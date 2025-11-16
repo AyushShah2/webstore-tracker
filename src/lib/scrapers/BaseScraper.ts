@@ -12,6 +12,10 @@ export abstract class BaseScraper<T extends Product> {
   protected abstract mergeData(parsedData: T, oldData: T | null): T
 
   public async scrape() {
+    if (!this.db.ready()) {
+      await this.db.init()
+    }
+
     for (const data of await this.getData()) {
       const parsedData = this.parseData(data)
       const oldData = await this.db.getProductByKey(parsedData.key)
