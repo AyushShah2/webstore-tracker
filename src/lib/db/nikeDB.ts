@@ -1,17 +1,15 @@
-import type { IndexProps } from "./baseDB";
-import { ScraperDB, type Product } from "./scraperDB";
+import { type Product, type ScraperDBSpec } from "./scraperDB"
 
 export interface NikeProduct extends Product {
-    groupKey: string,
-    productCode: string
+  groupKey: string
+  productCode: string
 }
 
-export class NikeDB extends ScraperDB<NikeProduct> {
-    constructor() {
-        const indexes: IndexProps[] = [
-            { indexName: "groupKey", keyPath: "groupKey", unique: false },
-            { indexName: "productCode", keyPath: "productCode", unique: true }
-        ]
-        super('nike', 1, indexes)
-    }
+export const NikeSpec: ScraperDBSpec = {
+  storeName: "nike",
+  version: 1,
+  indexes: [
+    { indexName: "groupKey", keyPath: "groupKey", unique: false },
+    { indexName: "productCode", keyPath: "productCode", unique: true },
+  ],
 }

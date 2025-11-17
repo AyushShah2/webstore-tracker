@@ -5,7 +5,7 @@ import { NikeScraper } from "~lib/scrapers/nike/v1/nikeScraper"
 import { loadSettings } from "~lib/settings/settings"
 import { STORES } from "~lib/settings/stores"
 
-export { }
+export {}
 
 async function ensureDailyBatch() {
   const settings = await loadSettings()
@@ -33,14 +33,14 @@ function scheduleDaily() {
   browser.alarms.create("dailyCheck", { periodInMinutes: 1440 })
 }
 
+// Only uncomment for debugging
+// browser.runtime.onStartup.addListener(() => {
+//   ensureDailyBatch()
+// })
+
 browser.runtime.onInstalled.addListener(() => {
   console.log("Webstore Tracker installed")
   scheduleDaily()
-  ensureDailyBatch()
-})
-
-// Just for testing, should remove
-browser.runtime.onStartup.addListener(() => {
   ensureDailyBatch()
 })
 

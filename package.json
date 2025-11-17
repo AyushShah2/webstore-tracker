@@ -5,13 +5,20 @@
   "description": "A browser extension that will track the prices of all products in any webstore.",
   "author": "Ayush Shah, Eric Song",
   "scripts": {
+    "prepare": "husky",
     "dev": "plasmo dev",
+    "dev-edge": "plasmo dev --target=edge-mv3",
+    "dev-firefox": "plasmo dev --target=firefox-mv3",
+    "zip-firefox": "node ./zipBundle.mjs ./build/firefox-mv3-dev ./build firefox-mv3-dev",
     "build": "plasmo build",
-    "package": "plasmo package"
+    "package": "plasmo package",
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,html,json}\""
   },
   "dependencies": {
-    "@observablehq/plot": "^0.6.17",
     "@plasmohq/messaging": "^0.7.2",
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-dayjs-4": "^1.0.4",
+    "dayjs": "^1.11.18",
     "plasmo": "0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -22,16 +29,27 @@
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
-    "@types/webextension-polyfill": "^0.12.3",
+    "@types/webextension-polyfill": "^0.12.4",
+    "fast-glob": "^3.3.3",
+    "fflate": "^0.8.2",
+    "husky": "^9.1.7",
     "prettier": "3.2.4",
     "typescript": "5.3.3",
     "webextension-polyfill": "^0.12.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,html,json}": [
+      "prettier --write"
+    ]
   },
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
         "svgo": "2.8.0"
       }
+    },
+    "patchedDependencies": {
+      "@plasmohq/parcel-transformer-manifest": "patches/@plasmohq__parcel-transformer-manifest.patch"
     }
   },
   "manifest": {

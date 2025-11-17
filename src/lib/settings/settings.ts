@@ -26,9 +26,9 @@ export function withDefaults(base?: Partial<Settings>): Settings {
 
 export async function loadSettings(): Promise<Settings> {
   const obj = await browser.storage.sync.get(KEY)
-  return withDefaults(obj[KEY])
+  return withDefaults(obj[KEY] as Settings)
 }
 
 export async function saveSettings(s: Settings): Promise<void> {
-  await browser.storage.sync.set({ KEY: withDefaults(s) })
+  await browser.storage.sync.set({ [KEY]: withDefaults(s) })
 }

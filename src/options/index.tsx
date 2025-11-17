@@ -21,38 +21,36 @@ export default function Options() {
     saveSettings(next).finally(() => setSaving(false))
   }
 
-  if (!settings) {
-    return (
-      <main className="page">
-        <div className="panel">Loading…</div>
-      </main>
-    )
-  }
-
   return (
     <main className="page">
       <div className="panel">
-        <h1 className="title">Webstore Tracker</h1>
-        <p className="subtitle">Choose which stores to enable</p>
+        {settings ? (
+          <>
+            <h1 className="title">Webstore Tracker</h1>
+            <p className="subtitle">Choose which stores to enable</p>
 
-        <section className="list">
-          {STORES.map((s) => {
-            const checked = settings.enabled?.[s.id] ?? s.enabledByDefault ?? true
-            return (
-              <label key={s.id} className="row">
-                <span className="store">{s.name}</span>
-                <span className="toggle">
-                  <input type="checkbox" role="switch" aria-label={`Enable ${s.name}`} checked={checked} onChange={() => onToggle(s.id)} />
-                  <span className="slider" aria-hidden />
-                </span>
-              </label>
-            )
-          })}
-        </section>
+            <section className="list">
+              {STORES.map((s) => {
+                const checked = settings.enabled?.[s.id] ?? s.enabledByDefault ?? true
+                return (
+                  <label key={s.id} className="row">
+                    <span className="store">{s.name}</span>
+                    <span className="toggle">
+                      <input type="checkbox" role="switch" aria-label={`Enable ${s.name}`} checked={checked} onChange={() => onToggle(s.id)} />
+                      <span className="slider" aria-hidden />
+                    </span>
+                  </label>
+                )
+              })}
+            </section>
 
-        <div aria-live="polite" className="saveHint">
-          {saving ? "Saving…" : "Saved"}
-        </div>
+            <div aria-live="polite" className="saveHint">
+              {saving ? "Saving…" : "Saved"}
+            </div>
+          </>
+        ) : (
+          "Loading..."
+        )}
       </div>
     </main>
   )

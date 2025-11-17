@@ -1,3 +1,5 @@
+import { printError } from "~lib/common"
+
 export interface ObjectStore {
   name: string
   indexes?: Array<IndexProps>
@@ -15,7 +17,7 @@ export interface DBItem {
   key: string
 }
 
-type TransactionAction = (store: IDBObjectStore, setResult: (res: unknown) => void) => Promise<void>
+type TransactionAction = (store: IDBObjectStore) => IDBRequest<unknown>
 
 export class BaseDB<S extends DBItem> {
   private static instanceMap: Map<string, BaseDB<DBItem>> = new Map()
@@ -64,9 +66,10 @@ export class BaseDB<S extends DBItem> {
             }
             break
           default:
-            if (upgradeDB) {
+            // newVersion being null means db is being deleted
+            if (upgradeDB && event.newVersion) {
               upgradeDB(event.oldVersion, event.newVersion, db)
-            } else {
+            } else if (!upgradeDB) {
               reject(new Error("DB needs upgrade, but no upgrade handler was provided."))
             }
             break
@@ -81,70 +84,65 @@ export class BaseDB<S extends DBItem> {
     })
   }
 
-  async addOrUpdateItem(storeName: string, item: S): Promise<void> {
-    const action: TransactionAction = async (store, setResult) => {
-      const result = await new Promise<void>((resolve, reject) => {
-        const request = store.put(item)
-        request.onsuccess = () => resolve()
-        request.onerror = () => reject(request.error)
-      })
-      setResult(result)
-    }
+  async addOrUpdateItem(storeName: string, item: S): Promise<boolean> {
+    const action: TransactionAction = (store) => store.put(item)
 
-    return await this.makeTransaction(storeName, "readwrite", action) as void
+    const result = await this.makeObjectStoreRequest(storeName, "readwrite", action)
+    return !!result
   }
 
-  async getItemByKey(storeName: string, key: string): Promise<S | undefined> {
-    const action: TransactionAction = async (store, setResult) => {
-      const result = await new Promise<S | undefined>((resolve, reject) => {
-        const request = store.get(key)
-        request.onsuccess = () => resolve(request.result)
-        request.onerror = () => reject(request.error)
-      })
-      setResult(result)
-    }
+  async getItemByKey(storeName: string, key: string): Promise<S | null> {
+    const action: TransactionAction = (store) => store.get(key)
 
-    return await this.makeTransaction(storeName, "readonly", action) as S | undefined
+    const item = await this.makeObjectStoreRequest(storeName, "readonly", action)
+    if (item && typeof item === "object") {
+      return item as S
+    }
+    return null
   }
 
-  async getItemByIndex(storeName: string, indexName: string, searchKey: string): Promise<S | undefined> {
-    const action: TransactionAction = async (store, setResult) => {
-      const result = await new Promise<S | undefined>((resolve, reject) => {
-        const request = store.index(indexName)?.get(searchKey)
-        request.onsuccess = () => resolve(request.result)
-        request.onerror = () => reject(request.error)
-      })
-      setResult(result)
-    }
+  async getItemByIndex(storeName: string, indexName: string, searchKey: string): Promise<S | null> {
+    const action: TransactionAction = (store) => store.index(indexName)?.get(searchKey)
 
-    return await this.makeTransaction(storeName, "readonly", action) as S | undefined
+    const item = await this.makeObjectStoreRequest(storeName, "readonly", action)
+    if (item && typeof item === "object") {
+      return item as S
+    }
+    return null
   }
 
-  async size(storeName: string): Promise<number> {
-    const action: TransactionAction = async (store, setResult) => {
-      const result = await new Promise<number>((resolve, reject) => {
-        const request = store.count()
-        request.onsuccess = () => resolve(request.result)
-        request.onerror = () => reject(request.error)
-      })
-      setResult(result)
+  async size(storeName: string): Promise<number | null> {
+    const action: TransactionAction = (store) => store.count()
+
+    const item = await this.makeObjectStoreRequest(storeName, "readonly", action)
+    if (typeof item === "number") {
+      return item
     }
-    
-    return await this.makeTransaction(storeName, "readonly", action) as number
+    return null
   }
 
-  async makeTransaction(storeName: string, mode: IDBTransactionMode, action: TransactionAction): Promise<unknown> {
+  private async makeObjectStoreRequest(storeName: string, mode: IDBTransactionMode, action: TransactionAction): Promise<unknown> {
     const trxn = this.db.transaction(storeName, mode)
     const store = trxn.objectStore(storeName)
 
-    let result: unknown;
-    const setFunction = (res: unknown) => result = res
-    await action(store, setFunction)
+    try {
+      const result = await new Promise<unknown>((resolve, reject) => {
+        const request = action(store)
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
 
-    await new Promise<void>((resolve, reject) => {
-      trxn.oncomplete = () => resolve()
-      trxn.onerror = () => reject(trxn.error)
-    })
-    return result;
+      // wait for transaction auto-commit
+      await new Promise<void>((resolve, reject) => {
+        trxn.oncomplete = () => resolve()
+        trxn.onerror = () => reject(trxn.error)
+      })
+      return result
+    } catch (error: unknown) {
+      if (Error.isError(error)) {
+        printError(error)
+        return null
+      }
+    }
   }
 }
