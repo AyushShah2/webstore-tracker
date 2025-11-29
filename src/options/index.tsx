@@ -1,16 +1,59 @@
 import { useEffect, useState, type ReactNode } from "react"
 
-import { loadSettings, saveSettings, withDefaults, type Settings } from "~lib/settings/settings"
+import { loadSettings, saveSettings, type Settings } from "~lib/settings/settings"
 import { STORES } from "~lib/settings/stores"
 
 import "./options.css"
 
-function Collapsible({ label, children }: { label: string; children: ReactNode }) {
-  const [open, setOpen] = useState(true)
+interface FieldProps {
+  label: string
+}
+
+interface GroupFieldProps extends FieldProps {
+  children: ReactNode
+}
+
+function RowField({ label, children }: GroupFieldProps) {
+  return (
+    <label className="field-label row">
+      {label}
+      {children}
+    </label>
+  )
+}
+
+interface SilderProps extends FieldProps {
+  value: boolean
+  listener?: React.ChangeEventHandler<HTMLInputElement>
+}
+
+function Slider({ label, value, listener }: SilderProps) {
+  return (
+    <RowField label={label}>
+      <div className="toggle">
+        <input type="checkbox" role="switch" aria-label={`Enable ${label}`} checked={value} onChange={listener} />
+        <span className="slider" aria-hidden />
+      </div>
+    </RowField>
+  )
+}
+
+interface CollapsibleProps extends GroupFieldProps {
+  defaultValue?: boolean
+  listener?: React.MouseEventHandler<HTMLDivElement>
+}
+
+function Collapsible({ label, children, defaultValue, listener }: CollapsibleProps) {
+  const [open, setOpen] = useState(defaultValue ?? true)
+
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    setOpen(!open)
+    listener?.(e)
+  }
 
   return (
     <section>
-      <div className="collapse-control" onClick={() => setOpen(!open)}>
+      <div className="collapse-control" onClick={handleClick}>
         <span className="section-settings-header">{label}</span>
         <span style={{ marginLeft: "10px" }} className={open ? "arrow-down" : "arrow-right"}></span>
       </div>
@@ -52,20 +95,12 @@ export default function Options() {
               </div>
             </section>
 
-            <section id="settings">
+            <section className="list">
               <Collapsible label="Store Settings">
                 <section className="list">
                   {STORES.map((s) => {
                     const checked = settings.enabled?.[s.id] ?? s.enabledByDefault ?? true
-                    return (
-                      <label key={s.id} className="row">
-                        <span className="store">{s.name}</span>
-                        <span className="toggle">
-                          <input type="checkbox" role="switch" aria-label={`Enable ${s.name}`} checked={checked} onChange={() => onToggle(s.id)} />
-                          <span className="slider" aria-hidden />
-                        </span>
-                      </label>
-                    )
+                    return <Slider label={s.name} key={s.id} value={checked} listener={() => onToggle(s.id)} />
                   })}
                 </section>
               </Collapsible>

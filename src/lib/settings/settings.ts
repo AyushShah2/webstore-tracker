@@ -4,11 +4,13 @@ import { STORES } from "./stores"
 
 export interface Settings {
   enabled: Record<string, boolean>
+  time: number // number of miliseconds after epoch
 }
 
 const KEY = "settings"
 const defaults: Settings = {
   enabled: Object.fromEntries(STORES.map((s) => [s.id, s.enabledByDefault ?? true])),
+  time: Date.now(),
 }
 
 export function withDefaults(base?: Partial<Settings>): Settings {
@@ -24,5 +26,5 @@ export async function loadSettings(): Promise<Settings> {
 }
 
 export async function saveSettings(s: Settings): Promise<void> {
-  await browser.storage.sync.set({ [KEY]: withDefaults(s) })
+  await browser.storage.sync.set({ [KEY]: s })
 }

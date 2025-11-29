@@ -43,7 +43,7 @@ body{background:var(--bg)}
   display:flex; align-items:center; justify-content:space-between;
   padding:8px 0;
 }
-.store{ font-size:15px }
+.field-label{ font-size:15px }
 
 /* Slider toggle */
 .toggle{ position:relative; display:inline-block; width:48px; height:26px }
@@ -61,7 +61,7 @@ body{background:var(--bg)}
 
 #saveHint{ margin-top:12px; font-size:13px; color:var(--muted); text-align:end }
 
-.section-settings-header{ font-size:16px }
+.section-settings-header{ font-weight:bold; font-size:large }
 
 /* https://blog.kalehmann.de/blog/2020/09/10/css-centered-equilateral-triangle.html */
 .arrow-down{

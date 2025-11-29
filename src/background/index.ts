@@ -7,6 +7,8 @@ import { STORES } from "~lib/settings/stores"
 
 export {}
 
+const dailyScrapeAlarmName = "dailyCheck"
+
 async function ensureDailyBatch() {
   const settings = await loadSettings()
   STORES.forEach(async (store) => {
@@ -30,13 +32,17 @@ async function ensureDailyBatch() {
 
 function scheduleDaily() {
   // Runs every 24h from creation time.
-  browser.alarms.create("dailyCheck", { periodInMinutes: 1440 })
+  browser.alarms.create(dailyScrapeAlarmName, { periodInMinutes: 1440 })
 }
 
-// Only uncomment for debugging
-// browser.runtime.onStartup.addListener(() => {
-//   ensureDailyBatch()
-// })
+browser.runtime.onStartup.addListener(async () => {
+  console.log("Checking if alarm is present...")
+  const alarm = await browser.alarms.get(dailyScrapeAlarmName)
+  if (!alarm) {
+    console.log("Alarm not present, creating...")
+    scheduleDaily()
+  }
+})
 
 browser.runtime.onInstalled.addListener(() => {
   console.log("Webstore Tracker installed")
@@ -45,5 +51,5 @@ browser.runtime.onInstalled.addListener(() => {
 })
 
 browser.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "dailyCheck") ensureDailyBatch()
+  if (alarm.name === dailyScrapeAlarmName) ensureDailyBatch()
 })
